@@ -1,0 +1,77 @@
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { Link } from 'react-router-dom';
+import { NavLink } from "react-router-dom";
+import ReactPaginate from 'react-paginate';
+
+const Products = ()=>{
+
+    const [data, setData] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [pageNumber, setPageNumber] = useState(0);
+    const itemsPerPage = 12;
+
+  useEffect(() => {
+      const fetchData = async () => {
+      const response = await axios.get('https://dummyjson.com/products');
+      setData(response.data.products);
+      setLoading(false);
+    };
+
+    fetchData();
+  }, []);
+
+  const pageCount = Math.ceil(data.length / itemsPerPage);
+
+  const handlePageClick = ({ selected }) => {
+    setPageNumber(selected);
+  };
+
+  const displayedItems = data.slice(
+    pageNumber * itemsPerPage,
+    (pageNumber + 1) * itemsPerPage
+  );
+
+  if (loading) {
+    return <p>Loading...</p>; // Display a loading message or spinner
+  }
+    
+
+    return(
+        <>
+            <section className="we-support line-title">
+                <div className="container">
+                    <div className="sec-title">
+                        <h2>All Products</h2>
+                    </div>
+                        
+                    <div className="row">
+
+                        {displayedItems.map(item => (
+                            <div className='product-box col_4' key={item.id}>
+                                <img src={item.thumbnail}  alt='' />
+                                
+                                <h4>{item.title}</h4>
+                                <p>{item.description}</p>
+                            </div>
+                            ))}
+                    </div>
+
+                    <ReactPaginate
+                        previousLabel={'Previous'}
+                        nextLabel={'Next'}
+                        breakLabel={'...'}
+                        pageCount={pageCount}
+                        marginPagesDisplayed={3}
+                        pageRangeDisplayed={3}
+                        onPageChange={handlePageClick}
+                        containerClassName={'pagination'}
+                        activeClassName={'active'}
+                    />
+                </div>
+            </section>
+        </>
+    )
+}
+
+export default Products;
